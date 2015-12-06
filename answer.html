@@ -1,0 +1,141 @@
+<!doctype html>
+<html>
+<head>
+    <title>Barbarian Quiz</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script>
+        $(function () {
+            // please enter your answer here
+            // you must include comments wherever you feel are necessary
+            var charset = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ~`!@#$%^&*()_+-={}[]:";\'<>?,./|\\';
+            var br = 100, randomLength = 25, counter = 1;
+            var input = $(".input-text"), output = $(".output-text");
+
+            //create random string of 25 characters
+            function randomString(length) {
+                var result = "";
+                for (var i = length; i > 0; --i) {
+                    result += charset[Math.floor(Math.random() * charset.length)];
+                }
+                return result;
+            }
+
+            //enclose every character into span tag
+            //add hidden attribute to span when required
+            //add <br> after every 100 spans
+            function createSpan(s, hidden) {
+                var output = "";
+                for (var i = 0; i < s.length; i++) {
+                    if (counter % 100 === 0)
+                        output += "<br>";
+                    if (hidden)
+                        output += "<span hidden>" + s[i] + "</span>";
+                    else output += "<span>" + s[i] + "</span>";
+                    counter++;
+                }
+                return output;
+            }
+
+            //scrambles every character in the input string
+            function scramble(s) {
+                if (s.length < 1) {
+                    alert("Please enter text to scramble");
+                    return;
+                }
+                var enc = "";
+                var temp = "";
+                for (var i = 0; i < s.length; i++) {
+                    enc += createSpan(s[i], true);
+                    temp = randomString(randomLength);
+                    enc += createSpan(temp);
+                }
+                return enc;
+            }
+            //parses span elements as HTML and extracts the content from hidden span
+            function unscramble(s) {
+                if (s.length < 1) {
+                    alert("Please enter text to unscramble");
+                    return;
+                }
+                var html = $.parseHTML(s);
+                var decoded = "";
+                $.each(html, function (i, el) {
+                    if (el.hidden)
+                        decoded += el.innerHTML;
+                })
+
+                if (decoded.length < 1)
+                    alert("No hidden message found!");
+
+                else return decoded;
+            }
+            //scramble button click handler
+            $(".scramble-button").on('click', function () {
+                var text = input.val();
+                output.val(scramble(text));
+            });
+            //unscramble button click handler
+            $(".unscramble-button").on('click', function () {
+                var text = input.val();
+                output.val(unscramble(text));
+            });
+            //reset button click handler
+            $(".clear-button").on('click', function () {
+                input.val("");
+                output.val("");
+            });
+
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: arial;
+            font-size: 13px;
+        }
+
+        .boxsizing {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: none;
+            width: 100%;
+            height: 260px;
+            border: 1px solid #cccccc;
+            border-radius: 3px;
+            margin-bottom: 5px;
+            box-shadow: inset 1px 1px 6px 0px #dddddd;
+            padding: 7px 10px;
+        }
+
+        button {
+            height: 30px;
+            min-width: 100px;
+            margin-top: 5px;;
+        }
+
+        label {
+            color:#888888;
+            margin-top: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+            text-transform: uppercase;
+        }
+
+
+    </style>
+</head>
+<body>
+<label>Enter scrambled/unscrambled text here</label>
+<textarea class="input-text boxsizing"></textarea>
+<label>Result</label>
+<textarea class="output-text boxsizing" disabled></textarea>
+<button class="scramble-button button">Scramble</button>
+<button class="unscramble-button button">Unscramble</button>
+<button class="clear-button button">Clear</button>
+
+</body>
+</html>
